@@ -1,0 +1,14 @@
+{
+  "name": "restaurant-management",
+  "version": "1.0.0",
+  "description": "He thong quan ly nha hang",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "pg": "^8.13.0",
+    "prom-client": "^15.1.3"
+  }
+}

@@ -1,0 +1,227 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+}
+
+aside {
+    width: 250px;
+    min-height: 100vh;
+    background: #1f2937;
+    color: white;
+    padding: 28px 20px;
+}
+
+aside h2 {
+    margin-bottom: 5px;
+}
+
+aside p {
+    color: #cbd5e1;
+    font-size: 13px;
+    margin-bottom: 35px;
+}
+
+nav button {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+nav button:hover {
+    background: #374151;
+}
+
+main {
+    flex: 1;
+}
+
+header {
+    background: white;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+}
+
+header h1 {
+    margin: 0;
+}
+
+header p {
+    color: #777;
+    margin: 5px 0 0;
+}
+
+header span {
+    color: green;
+}
+
+#content {
+    padding: 30px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.card h3 {
+    color: #666;
+}
+
+.card strong {
+    font-size: 30px;
+}
+
+table {
+    width: 100%;
+    background: white;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th,
+td {
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #e5e7eb;
+}
+
+.table-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.table-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.available {
+    color: green;
+}
+
+.occupied {
+    color: #dc2626;
+}
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #64748b;
+    color: white;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background: #f59e0b;
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-delete {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.form-card {
+    margin-top: 25px;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+}
+
+.form-card input,
+.form-card select {
+    width: 100%;
+    padding: 11px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.form-card button {
+    margin-top: 10px;
+    margin-right: 8px;
+}
+.order-menu-list {
+    margin: 15px 0;
+}
+
+.order-menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 7px;
+}
+
+.order-quantity {
+    width: 80px !important;
+}
+
+.order-total {
+    font-size: 20px;
+    margin: 20px 0;
+    text-align: right;
+}
