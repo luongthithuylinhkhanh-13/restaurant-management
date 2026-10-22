@@ -1,40 +1,365 @@
 async function showDashboard() {
     document.getElementById("page-title").innerText = "Tổng quan";
 
-    const data =
-        await fetch("/api/dashboard").then(r => r.json());
+    try {
+        // Lấy dữ liệu tổng quan, đơn hàng và bàn ăn
+        const [dashboard, orders, tables] = await Promise.all([
+            fetch("/api/dashboard").then(r => r.json()),
+            fetch("/api/orders").then(r => r.json()),
+            fetch("/api/tables").then(r => r.json())
+        ]);
 
-    document.getElementById("content").innerHTML = `
-        <div class="cards">
+        // Lấy 3 đơn hàng gần nhất
+        const recentOrders = [...orders]
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, 3);
 
-            <div class="card">
-                <h3>Món ăn</h3>
-                <strong>${data.dishes}</strong>
-                <p>Tổng số món</p>
+        // Ngày hiện tại
+        const today = new Date();
+
+        const dateText = today.toLocaleDateString("vi-VN", {
+            weekday: "long",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        });
+
+        document.getElementById("content").innerHTML = `
+
+            <!-- CHÀO MỪNG -->
+            <div class="dashboard-welcome">
+                <h2>Chào mừng đến với hệ thống quản lý nhà hàng!</h2>
+                <p>Hôm nay là ${dateText}</p>
             </div>
 
-            <div class="card">
-                <h3>Bàn ăn</h3>
-                <strong>${data.tables}</strong>
-                <p>Tổng số bàn</p>
+
+            <!-- 4 THẺ THỐNG KÊ -->
+            <div class="dashboard-stats">
+
+                <!-- MÓN ĂN -->
+                <div class="stat-card stat-food">
+
+                    <div class="stat-main">
+
+                        <div class="stat-icon">
+                            ♨
+                        </div>
+
+                        <div class="stat-info">
+                            <span>Tổng số món ăn</span>
+
+                            <strong>
+                                ${dashboard.dishes}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <button onclick="showMenu()">
+                        Xem chi tiết →
+                    </button>
+
+                </div>
+
+
+                <!-- BÀN ĂN -->
+                <div class="stat-card stat-table">
+
+                    <div class="stat-main">
+
+                        <div class="stat-icon">
+                            ▦
+                        </div>
+
+                        <div class="stat-info">
+                            <span>Tổng số bàn ăn</span>
+
+                            <strong>
+                                ${dashboard.tables}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <button onclick="showTables()">
+                        Xem chi tiết →
+                    </button>
+
+                </div>
+
+
+                <!-- ĐƠN HÀNG -->
+                <div class="stat-card stat-order">
+
+                    <div class="stat-main">
+
+                        <div class="stat-icon">
+                            ▤
+                        </div>
+
+                        <div class="stat-info">
+                            <span>Tổng đơn hàng</span>
+
+                            <strong>
+                                ${dashboard.orders}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <button onclick="showOrders()">
+                        Xem chi tiết →
+                    </button>
+
+                </div>
+
+
+                <!-- DOANH THU -->
+                <div class="stat-card stat-revenue">
+
+                    <div class="stat-main">
+
+                        <div class="stat-icon">
+                            ₫
+                        </div>
+
+                        <div class="stat-info">
+                            <span>Doanh thu</span>
+
+                            <strong>
+                                ${Number(dashboard.revenue)
+                                    .toLocaleString("vi-VN")} đ
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <button onclick="showOrders()">
+                        Xem chi tiết →
+                    </button>
+
+                </div>
+
             </div>
 
-            <div class="card">
-                <h3>Đơn hàng</h3>
-                <strong>${data.orders}</strong>
-                <p>Tổng đơn hàng</p>
-            </div>
 
-            <div class="card">
-                <h3>Doanh thu</h3>
-                <strong>
-                    ${Number(data.revenue).toLocaleString("vi-VN")} đ
-                </strong>
-                <p>Đã thanh toán</p>
-            </div>
+            <!-- PHẦN DƯỚI DASHBOARD -->
+            <div class="dashboard-bottom">
 
-        </div>
-    `;
+
+                <!-- ĐƠN HÀNG GẦN ĐÂY -->
+                <div class="dashboard-panel recent-orders">
+
+                    <div class="panel-title">
+
+                        <h3>
+                            ▤ &nbsp; Đơn hàng gần đây
+                        </h3>
+
+                        <button onclick="showOrders()">
+                            Xem tất cả
+                        </button>
+
+                    </div>
+
+
+                    <div class="dashboard-table">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>#</th>
+                                    <th>Bàn ăn</th>
+                                    <th>Thời gian</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                ${
+                                    recentOrders.length > 0
+                                    ?
+                                    recentOrders.map(order => `
+
+                                        <tr>
+
+                                            <td>
+                                                <strong>
+                                                    #${order.id}
+                                                </strong>
+                                            </td>
+
+
+                                            <td>
+                                                ${order.table_number || "-"}
+                                            </td>
+
+
+                                            <td>
+                                                ${new Date(order.created_at)
+                                                    .toLocaleString("vi-VN")}
+                                            </td>
+
+
+                                            <td>
+                                                <strong>
+                                                    ${Number(order.total_amount)
+                                                        .toLocaleString("vi-VN")} đ
+                                                </strong>
+                                            </td>
+
+
+                                            <td>
+
+                                                <span class="
+                                                    dashboard-status
+                                                    ${
+                                                        order.status === "PAID"
+                                                        ? "paid"
+                                                        : "open"
+                                                    }
+                                                ">
+
+                                                    ${
+                                                        order.status === "PAID"
+                                                        ? "Đã thanh toán"
+                                                        : "Đang mở"
+                                                    }
+
+                                                </span>
+
+                                            </td>
+
+
+                                            <td>
+
+                                                <button
+                                                    class="dashboard-view-btn"
+                                                    onclick="showOrders()">
+
+                                                    Xem chi tiết
+
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+
+                                    `).join("")
+                                    :
+                                    `
+                                        <tr>
+
+                                            <td
+                                                colspan="6"
+                                                class="empty-data">
+
+                                                Chưa có đơn hàng
+
+                                            </td>
+
+                                        </tr>
+                                    `
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TÌNH TRẠNG BÀN -->
+                <div class="dashboard-panel table-status-panel">
+
+                    <div class="panel-title">
+
+                        <h3>
+                            ▦ &nbsp; Tình trạng bàn ăn
+                        </h3>
+
+
+                        <div class="status-legend">
+
+                            <span>
+                                <i class="legend-dot available-dot"></i>
+                                Còn trống
+                            </span>
+
+                            <span>
+                                <i class="legend-dot occupied-dot"></i>
+                                Đang sử dụng
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="dashboard-table-grid">
+
+                        ${tables.map(table => `
+
+                            <div class="dashboard-table-card">
+
+                                <strong>
+                                    ${table.table_number}
+                                </strong>
+
+                                <p>
+                                    ${table.capacity} chỗ
+                                </p>
+
+
+                                <span class="
+                                    table-state
+                                    ${
+                                        table.status === "AVAILABLE"
+                                        ? "available"
+                                        : "occupied"
+                                    }
+                                ">
+
+                                    <i></i>
+
+                                    ${
+                                        table.status === "AVAILABLE"
+                                        ? "Còn trống"
+                                        : "Đang sử dụng"
+                                    }
+
+                                </span>
+
+                            </div>
+
+                        `).join("")}
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+    } catch (error) {
+
+        console.error("Lỗi tải dashboard:", error);
+
+        document.getElementById("content").innerHTML = `
+            <div class="loading">
+                Không thể tải dữ liệu tổng quan.
+            </div>
+        `;
+    }
 }
 
 async function showMenu() {
@@ -849,3 +1174,174 @@ async function payOrder(id) {
         );
     }
 }
+// =====================================================
+// XỬ LÝ ĐĂNG NHẬP - ĐĂNG KÝ
+// =====================================================
+
+function showLogin() {
+    document.getElementById("login-box").classList.remove("hidden");
+    document.getElementById("register-box").classList.add("hidden");
+
+    const message = document.getElementById("login-message");
+    message.className = "auth-message";
+    message.innerText = "";
+}
+
+function showRegister() {
+    document.getElementById("login-box").classList.add("hidden");
+    document.getElementById("register-box").classList.remove("hidden");
+
+    const message = document.getElementById("register-message");
+    message.className = "auth-message";
+    message.innerText = "";
+}
+
+function showApplication(user) {
+    document.getElementById("auth-screen").classList.add("hidden");
+    document.getElementById("sidebar").classList.remove("hidden");
+    document.getElementById("main-content").classList.remove("hidden");
+
+    const userName = document.getElementById("current-user-name");
+
+    if (userName && user) {
+        userName.innerText = user.full_name;
+    }
+
+    showDashboard();
+}
+
+function logout() {
+    localStorage.removeItem("restaurantUser");
+
+    document.getElementById("auth-screen").classList.remove("hidden");
+    document.getElementById("sidebar").classList.add("hidden");
+    document.getElementById("main-content").classList.add("hidden");
+
+    document.getElementById("login-form").reset();
+
+    showLogin();
+}
+
+
+// ĐĂNG NHẬP
+async function loginUser() {
+
+    const email = document.getElementById("login-email").value.trim();
+    const password = document.getElementById("login-password").value;
+    const message = document.getElementById("login-message");
+
+    message.className = "auth-message";
+    message.innerText = "";
+
+    try {
+        const response = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email,
+                password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            message.className = "auth-message error";
+            message.innerText = data.error || "Đăng nhập thất bại";
+            return;
+        }
+
+        localStorage.setItem(
+            "restaurantUser",
+            JSON.stringify(data.user)
+        );
+
+        showApplication(data.user);
+
+    } catch (error) {
+        message.className = "auth-message error";
+        message.innerText = "Không thể kết nối đến hệ thống";
+    }
+}
+
+
+// ĐĂNG KÝ
+async function registerUser() {
+    const full_name = document.getElementById("register-name").value.trim();
+    const email = document.getElementById("register-email").value.trim();
+    const password = document.getElementById("register-password").value;
+    const message = document.getElementById("register-message");
+
+    message.className = "auth-message";
+    message.innerText = "";
+
+    try {
+        const response = await fetch("/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                full_name,
+                email,
+                password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            message.className = "auth-message error";
+            message.innerText = data.error || "Đăng ký thất bại";
+            return;
+        }
+
+        message.className = "auth-message success";
+        message.innerText = "Đăng ký thành công. Đang chuyển đến trang đăng nhập...";
+
+        document.getElementById("register-form").reset();
+
+        setTimeout(() => {
+            showLogin();
+
+            document.getElementById("login-email").value = email;
+
+            const loginMessage = document.getElementById("login-message");
+            loginMessage.className = "auth-message success";
+            loginMessage.innerText = "Đăng ký thành công. Vui lòng đăng nhập.";
+        }, 1000);
+
+    } catch (error) {
+        message.className = "auth-message error";
+        message.innerText = "Không thể kết nối đến hệ thống";
+    }
+}
+
+
+// KHI MỞ WEBSITE
+document.addEventListener("DOMContentLoaded", () => {
+    const savedUser = localStorage.getItem("restaurantUser");
+
+    if (savedUser) {
+        try {
+            const user = JSON.parse(savedUser);
+            showApplication(user);
+        } catch (error) {
+            localStorage.removeItem("restaurantUser");
+
+            document.getElementById("sidebar").classList.add("hidden");
+            document.getElementById("main-content").classList.add("hidden");
+            document.getElementById("auth-screen").classList.remove("hidden");
+
+            showLogin();
+        }
+    } else {
+        document.getElementById("sidebar").classList.add("hidden");
+        document.getElementById("main-content").classList.add("hidden");
+        document.getElementById("auth-screen").classList.remove("hidden");
+
+        showLogin();
+    }
+});

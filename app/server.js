@@ -1,6 +1,7 @@
 const express = require("express");
 const { Pool } = require("pg");
 const client = require("prom-client");
+const bcrypt = require("bcryptjs");
 
 
 const app = express();
@@ -44,7 +45,126 @@ app.get("/api/health", async (req, res) => {
         });
     }
 });
+//API đăng kí
+// =====================================================
+// ĐĂNG KÝ TÀI KHOẢN
+// =====================================================
+app.post("/api/auth/register", async (req, res) => {
+    try {
+        const { full_name, email, password } = req.body;
 
+        if (!full_name || !email || !password) {
+            return res.status(400).json({
+                error: "Vui lòng nhập đầy đủ họ tên, email và mật khẩu"
+            });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({
+                error: "Mật khẩu phải có ít nhất 6 ký tự"
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const existingUser = await pool.query(
+            "SELECT id FROM users WHERE email = $1",
+            [normalizedEmail]
+        );
+
+        if (existingUser.rows.length > 0) {
+            return res.status(409).json({
+                error: "Email này đã được đăng ký"
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const result = await pool.query(
+            `INSERT INTO users (full_name, email, password, role)
+             VALUES ($1, $2, $3, 'STAFF')
+             RETURNING id, full_name, email, role, created_at`,
+            [
+                full_name.trim(),
+                normalizedEmail,
+                hashedPassword
+            ]
+        );
+
+        console.log("Registered user:", normalizedEmail);
+
+        res.status(201).json({
+            message: "Đăng ký tài khoản thành công",
+            user: result.rows[0]
+        });
+
+    } catch (error) {
+        console.error("ERROR register:", error.message);
+
+        res.status(500).json({
+            error: "Không thể đăng ký tài khoản"
+        });
+    }
+});
+// =====================================================
+// ĐĂNG NHẬP
+// =====================================================
+app.post("/api/auth/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                error: "Vui lòng nhập email và mật khẩu"
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        const result = await pool.query(
+            `SELECT id, full_name, email, password, role
+             FROM users
+             WHERE email = $1`,
+            [normalizedEmail]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(401).json({
+                error: "Email hoặc mật khẩu không chính xác"
+            });
+        }
+
+        const user = result.rows[0];
+
+        const passwordCorrect = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if (!passwordCorrect) {
+            return res.status(401).json({
+                error: "Email hoặc mật khẩu không chính xác"
+            });
+        }
+
+        res.json({
+            message: "Đăng nhập thành công",
+            user: {
+                id: user.id,
+                full_name: user.full_name,
+                email: user.email,
+                role: user.role
+            }
+        });
+
+    } catch (error) {
+        console.error("ERROR login:", error.message);
+
+        res.status(500).json({
+            error: "Không thể đăng nhập"
+        });
+    }
+});
 // Dashboard
 app.get("/api/dashboard", async (req, res) => {
     try {
