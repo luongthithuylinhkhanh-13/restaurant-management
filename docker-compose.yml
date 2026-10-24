@@ -4,18 +4,20 @@ services:
 
   postgres:
     image: postgres:15-alpine
-    container_name: restaurant-postgres
+    container_name: thuylinh-kthp-postgres
     restart: unless-stopped
 
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - restaurant-backend
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:latest
-    container_name: restaurant-postgres-exporter
+    container_name: thuylinh-kthp-postgres-exporter
     restart: unless-stopped
 
     environment:
@@ -30,7 +32,7 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
-    container_name: restaurant-cadvisor
+    container_name: thuylinh-kthp-cadvisor
     restart: unless-stopped
 
     volumes:
@@ -45,7 +47,7 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: restaurant-prometheus
+    container_name: thuylinh-kthp-prometheus
     restart: unless-stopped
 
     volumes:
@@ -55,7 +57,7 @@ services:
       - "9090:9090"
 
     depends_on:
-      - restaurant-app
+      - app
       - postgres-exporter
       - cadvisor
 
@@ -67,7 +69,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    container_name: restaurant-grafana
+    container_name: thuylinh-kthp-grafana
     restart: unless-stopped
 
     ports:
@@ -83,9 +85,9 @@ services:
       - restaurant-monitoring
 
 
-  restaurant-app:
+  app:
     build: ./app
-    container_name: restaurant-app
+    container_name: thuylinh-kthp-app
     restart: unless-stopped
 
     environment:
@@ -108,7 +110,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: restaurant-pgadmin
+    container_name: thuylinh-kthp-pgadmin
     restart: unless-stopped
 
     environment:
@@ -126,11 +128,11 @@ services:
 
   nginx:
     image: nginx:1.27-alpine
-    container_name: restaurant-nginx
+    container_name: thuylinh-kthp-nginx
     restart: unless-stopped
 
     depends_on:
-      - restaurant-app
+      - app
 
     ports:
       - "80:80"
@@ -144,7 +146,7 @@ services:
 
   loki:
     image: grafana/loki:2.9.8
-    container_name: restaurant-loki
+    container_name: thuylinh-kthp-loki
     restart: unless-stopped
     command: -config.file=/etc/loki/local-config.yaml
 
@@ -160,7 +162,7 @@ services:
 
   promtail:
     image: grafana/promtail:2.9.8
-    container_name: restaurant-promtail
+    container_name: thuylinh-kthp-promtail
     restart: unless-stopped
     command: -config.file=/etc/promtail/config.yml
 
@@ -176,8 +178,14 @@ services:
       - restaurant-monitoring
 volumes:
   postgres_data:
+    external:
+      name: restaurantmanagement_postgres_data
   grafana_data:
+    external:
+      name: restaurantmanagement_grafana_data
   loki_data:
+    external:
+      name: restaurantmanagement_loki_data
 
 networks:
 

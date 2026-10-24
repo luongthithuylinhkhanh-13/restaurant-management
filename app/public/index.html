@@ -2,8 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Hệ thống quản lý nhà hàng</title>
 
@@ -12,36 +11,256 @@
 
 <body>
 
-<aside>
-    <h2>RESTAURANT</h2>
-    <p>Hệ thống quản lý nhà hàng</p>
+    <!-- THANH MENU BÊN TRÁI -->
+    <aside id="sidebar" class="sidebar">
 
-    <nav>
-        <button onclick="showDashboard()">Tổng quan</button>
-        <button onclick="showMenu()">Quản lý món ăn</button>
-        <button onclick="showTables()">Quản lý bàn ăn</button>
-        <button onclick="showOrders()">Đơn hàng</button>
-    </nav>
-</aside>
+        <!-- Logo -->
+        <div class="brand">
+            <div class="brand-icon">NH</div>
 
-<main>
+            <div class="brand-text">
+                <h2>QUẢN LÝ<br>NHÀ HÀNG</h2>
+                <p>Hệ thống quản lý</p>
+            </div>
+        </div>
 
-<header>
-    <div>
-        <h1 id="page-title">Tổng quan</h1>
-        <p>Restaurant Management System</p>
+        <!-- Menu -->
+        <nav class="sidebar-nav">
+
+            <button
+                class="nav-item active"
+                onclick="setActive(this); showDashboard()">
+
+                <span class="nav-icon">⌂</span>
+                <span>Tổng quan</span>
+
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="setActive(this); showMenu()">
+
+                <span class="nav-icon">☷</span>
+                <span>Quản lý món ăn</span>
+
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="setActive(this); showTables()">
+
+                <span class="nav-icon">▦</span>
+                <span>Quản lý bàn ăn</span>
+
+            </button>
+
+            <button
+                class="nav-item"
+                onclick="setActive(this); showOrders()">
+
+                <span class="nav-icon">▤</span>
+                <span>Quản lý đơn hàng</span>
+
+            </button>
+
+        </nav>
+
+        <!-- Trạng thái hệ thống -->
+        <div class="sidebar-footer">
+
+            <span class="system-dot"></span>
+
+            <div>
+                <strong>Hệ thống hoạt động</strong>
+                <p>Sẵn sàng phục vụ</p>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- NỘI DUNG CHÍNH -->
+<main id="main-content" class="main-content">
+
+        <!-- HEADER -->
+        <header class="top-header">
+
+            <div class="header-title">
+
+                <p class="breadcrumb">
+                    HỆ THỐNG QUẢN LÝ NHÀ HÀNG
+                </p>
+
+                <h1 id="page-title">
+                    Tổng quan
+                </h1>
+
+                <p class="page-description">
+                    Theo dõi và quản lý hoạt động của nhà hàng
+                </p>
+
+            </div>
+
+
+            <!-- Tài khoản -->
+            <div class="header-user">
+
+                <div class="user-avatar">
+                    QT
+                </div>
+
+                <div class="user-info">
+                    <strong id="current-user-name">Quản trị viên</strong>
+                    <p>
+                        <span class="online-dot"></span>
+                        Đang hoạt động
+                    </p>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                      Đăng xuất
+                 </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- NỘI DUNG THAY ĐỔI BẰNG JAVASCRIPT -->
+        <section id="content" class="page-content">
+
+            <div class="loading">
+                Đang tải dữ liệu...
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- JAVASCRIPT -->
+    <script src="app.js"></script>
+
+    <script>
+
+        // Đánh dấu menu đang được chọn
+        function setActive(button) {
+
+            document
+                .querySelectorAll(".nav-item")
+                .forEach(item => {
+                    item.classList.remove("active");
+                });
+
+            button.classList.add("active");
+        }
+
+    </script>
+
+<!-- ==================== ĐĂNG NHẬP / ĐĂNG KÝ ==================== -->
+<div id="auth-screen" class="auth-screen">
+    <div class="auth-container">
+
+        <div class="auth-brand">
+            <div class="auth-logo">NH</div>
+            <h1>QUẢN LÝ NHÀ HÀNG</h1>
+            <p>Hệ thống quản lý nhà hàng</p>
+        </div>
+
+        <!-- FORM ĐĂNG NHẬP -->
+        <div id="login-box" class="auth-box">
+            <h2>Đăng nhập</h2>
+            <p class="auth-subtitle">Đăng nhập để truy cập hệ thống</p>
+
+            <form id="login-form" onsubmit="return false;">
+                <div class="auth-field">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        id="login-email"
+                        placeholder="Nhập địa chỉ email"
+                        required
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label>Mật khẩu</label>
+                    <input
+                        type="password"
+                        id="login-password"
+                        placeholder="Nhập mật khẩu"
+                        required
+                    >
+                </div>
+
+                <div id="login-message" class="auth-message"></div>
+
+                <button type="button" class="auth-submit" onclick="loginUser()">
+                    Đăng nhập
+                </button>
+            </form>
+
+            <p class="auth-switch">
+                Chưa có tài khoản?
+                <button type="button" onclick="showRegister()">
+                    Đăng ký ngay
+                </button>
+            </p>
+        </div>
+
+        <!-- FORM ĐĂNG KÝ -->
+        <div id="register-box" class="auth-box hidden">
+            <h2>Đăng ký tài khoản</h2>
+            <p class="auth-subtitle">Tạo tài khoản để sử dụng hệ thống</p>
+
+            <form id="register-form" onsubmit="return false;">
+                <div class="auth-field">
+                    <label>Họ và tên</label>
+                    <input
+                        type="text"
+                        id="register-name"
+                        placeholder="Nhập họ và tên"
+                        required
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label>Email</label>
+                    <input
+                        type="email"
+                        id="register-email"
+                        placeholder="Nhập địa chỉ email"
+                        required
+                    >
+                </div>
+
+                <div class="auth-field">
+                    <label>Mật khẩu</label>
+                    <input
+                        type="password"
+                        id="register-password"
+                        placeholder="Tối thiểu 6 ký tự"
+                        minlength="6"
+                        required
+                    >
+                </div>
+
+                <div id="register-message" class="auth-message"></div>
+
+                <button type="button" class="auth-submit" onclick="registerUser()">
+                    Đăng ký
+                </button>
+            </form>
+
+            <p class="auth-switch">
+                Đã có tài khoản?
+                <button type="button" onclick="showLogin()">
+                    Đăng nhập
+                </button>
+            </p>
+        </div>
+
     </div>
-
-    <span>● Hệ thống hoạt động</span>
-</header>
-
-<section id="content">
-    Đang tải dữ liệu...
-</section>
-
-</main>
-
-<script src="app.js"></script>
-
+</div>
 </body>
 </html>
